@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversión Polar a Rectangular - Desglose Detallado</title>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #17a2b8;
+            border-bottom: 2px solid #17a2b8;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #343a40;
+            cursor: pointer;
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            transition: background-color 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        h2:hover {
+            background-color: #dee2e6;
+        }
+        .content {
+            padding: 10px 15px;
+            background-color: #fff;
+            border-left: 3px solid #17a2b8;
+            margin-top: -8px;
+            margin-bottom: 20px;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            display: none;
+            overflow: hidden;
+        }
+        .arrow {
+            transition: transform 0.3s;
+            font-size: 1.2em;
+        }
+        .active .arrow {
+            transform: rotate(90deg);
+        }
+        .step-title {
+            font-weight: bold;
+            color: #28a745;
+            margin-top: 10px;
+        }
+        .formula {
+            font-family: 'Consolas', 'Courier New', monospace; 
+            background: #f1f1f1;
+            padding: 12px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap; 
+        }
+        .result {
+            font-weight: bold;
+            color: #dc3545;
+            margin-top: 10px;
+        }
+        .calculator {
+            background: #e6f7ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 1px solid #b3e0ff;
+        }
+.quadrant-diagram {
+    max-width: 100%; 
+    
+    height: auto; 
+    
+    display: block; 
+    margin: 15px auto;
+    
+    max-height: 250px; 
+    object-fit: contain; 
+}
+        .calculator label, .calculator input[type="number"] {
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+        }
+        .calculator input[type="number"], .calculator button {
+            padding: 8px;
+            margin: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .calculator button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        .calc-output {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #28a745;
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: Arial, sans-serif;
+        }
+        .calc-formula-display {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            background: #d8eaff;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .pasos-desglose {
+            margin-top: 15px;
+            padding: 10px;
+            border-top: 1px dashed #ccc;
+            font-size: 0.9em;
+            font-weight: normal;
+        }
+        .pasos-desglose strong {
+            color: #0056b3;
+            display: block;
+            margin-top: 5px;
+        }
+        .quadrant-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 10pt;
+        }
+        .quadrant-table th, .quadrant-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .quadrant-table th {
+            background-color: #f2f2f2;
+        }
+        .quadrant-section {
+            padding: 15px 0;
+            border-bottom: 1px dashed #ccc;
+        }
+        .interactive-formula-line { 
+            font-size: 1.2em; 
+            font-weight: bold; 
+            margin-top: 15px;
+            display: block; 
+        }
+        .formula-part { 
+            cursor: help; 
+            border-bottom: 1px dashed #007bff; 
+        }
+        .formula-part:hover {
+            color: #007bff; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Polar a rectangular</h1>
+
+        <div class="calculator">
+            <h2>Calculadora de Conversión Detallada</h2>
+            <div class="calc-formula-display">
+                Fórmula: r(cos θ + i sen θ) = x + yi
+            </div>
+            
+            <label for="inputR">Radio (r):</label>
+            <input type="number" id="inputR" value="4" step="0.1">
+            
+            <label for="inputTheta">Ángulo (θ en grados):</label>
+            <input type="number" id="inputTheta" value="110">
+            
+            <button onclick="calcularConversion()">Calcular (x, y)</button>
+            
+            <div id="calcResultado" class="calc-output">
+                Resultado: Presiona 'Calcular (x, y)'
+            </div>
+        </div>
+        
+        <div class="quadrant-section">
+            <h2 style="cursor: default; background-color: transparent;">Regla de Cuadrantes para Coordenadas</h2>
+            <p>La posición de la coordenada rectangular (x, y) define el signo de las componentes y, por lo tanto, el cuadrante:</p>
+            <div class="quadrant-section"> 
+             <img src="licensed-image.jpg" 
+                 alt="Diagrama de Cuadrantes Trigonometricos" 
+                 class="quadrant-diagram"> 
+
+
+    
+    <table class="quadrant-table">
+        </table>
+    
+    </div>
+            
+
+
+            
+            <table class="quadrant-table">
+                <thead>
+                    <tr>
+                        <th>Cuadrante</th>
+                        <th>Coordenadas (x, y)</th>
+                        <th>Regla (Rectangular a Polar)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>I</td>
+                        <td>(+, +)</td>
+                        <td>θ</td>
+                    </tr>
+                    <tr>
+                        <td>II</td>
+                        <td>(–, +)</td>
+                        <td>180° - θ</td>
+                    </tr>
+                    <tr>
+                        <td>III</td>
+                        <td>(–, –)</td>
+                        <td>180° + θ</td>
+                    </tr>
+                    <tr>
+                        <td>IV</td>
+                        <td>(+, –)</td>
+                        <td>360° - θ</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <p class="interactive-formula-line">
+            <span class="formula-part" title="r: Radio Vector o Magnitud. Es la distancia desde el origen (polo) al punto.">r</span>
+            (
+            <span class="formula-part" title="cos θ: Coseno del Ángulo Polar. Usado para encontrar la componente X (real).">cos 
+                <span title="θ: Ángulo Polar o Argumento. Indica la dirección del punto desde el eje polar.">θ</span>
+            </span> 
+            + i 
+            <span class="formula-part" title="sen θ: Seno del Ángulo Polar. Usado para encontrar la componente Y (imaginaria).">sen 
+                <span title="θ: Ángulo Polar o Argumento. Indica la dirección del punto desde el eje polar.">θ</span>
+            </span>
+            )
+            
+            →
+
+            <span class="formula-part" title="x: Coordenada Real. El valor que se obtiene al multiplicar r * cos(θ).">x</span> 
+            + 
+            <span class="formula-part" title="yi: Coordenada Imaginaria. El valor que se obtiene al multiplicar r * sen(θ), acompañado de la unidad imaginaria 'i'.">y</span>i
+        </p>
+
+        <h2 class="accordion-header">
+            Ejemplo 1: 6(cos 330° + sen 330°)
+            <span class="arrow">▶</span>
+        </h2>
+        <div class="content">
+            <p class="step-title">PASO 1: Identificar r y θ</p>
+            <div class="formula">
+                r = 6 
+                θ = 330° (Cuadrante IV)
+            </div>
+
+            <p class="step-title">PASO 2: Calcular Valores Trigonométricos</p>
+            <div class="formula">
+                cos 330° = √3 / 2  ≈ 0.8660 
+                sen 330° = -1 / 2 = -0.5
+            </div>
+
+            <p class="step-title">PASO 3: Multiplicar r por componentes (Obtener x)</p>
+            <div class="formula">
+                x = 6 * cos(330°) = 6 * (√3 / 2) ≈ 5.196
+            </div>
+            
+            <p class="step-title">PASO 4: Multiplicar r por componentes (Obtener y)</p>
+            <div class="formula">
+                y = 6 * sen(330°) = 6 * (-1 / 2) = -3
+            </div>
+            
+            <p class="result">RESULTADO: 3√3 - 3i (Coordenada A(5.19, -3)) (Cuadrante IV)</p>
+        </div>
+
+        <h2 class="accordion-header">
+            Ejemplo 2: 4(cos 110° + sen 110°) (Uso de decimales)
+            <span class="arrow">▶</span>
+        </h2>
+        <div class="content">
+            <p class="step-title">PASO 1: Identificar r y θ</p>
+            <div class="formula">
+                r = 4 
+                θ = 110° (Cuadrante II)
+            </div>
+
+            <p class="step-title">PASO 2: Calcular Valores </p>
+            <div class="formula">
+                cos 110° ≈ -0.342 
+                sen 110° ≈ 0.939
+            </div>
+
+            <p class="step-title">PASO 3: Multiplicar r por componentes (Obtener x)</p>
+            <div class="formula">
+                x = 4 * cos(110°) = 4 * (-0.342) = -1.368
+            </div>
+            
+            <p class="step-title">PASO 4: Multiplicar r por componentes (Obtener y)</p>
+            <div class="formula">
+                y = 4 * sen(110°) = 4 * (0.939) = 3.756
+            </div>
+            
+            <p class="result">RESULTADO: -1.368 + 3.756i (Coherente con Cuadrante II)</p>
+        </div>
+
+    </div>
+
+    <script>
+        function determinarCuadrante(x, y) {
+            if (x > 0 && y > 0) return "I";
+            if (x < 0 && y > 0) return "II";
+            if (x < 0 && y < 0) return "III";
+            if (x > 0 && y < 0) return "IV";
+            
+            if (x === 0 && y !== 0) return "Eje Y";
+            if (y === 0 && x !== 0) return "Eje X";
+            if (x === 0 && y === 0) return "Origen";
+            
+            return "";
+        }
+
+        function calcularConversion() {
+            const r = parseFloat(document.getElementById('inputR').value);
+            const theta_deg = parseFloat(document.getElementById('inputTheta').value);
+            const outputDiv = document.getElementById('calcResultado');
+
+            if (isNaN(r) || isNaN(theta_deg)) {
+                outputDiv.innerHTML = "Resultado: Introduce valores numéricos válidos.";
+                outputDiv.style.color = '#dc3545';
+                return;
+            }
+
+            const theta_rad = theta_deg * (Math.PI / 180);
+
+            const cos_theta_raw = Math.cos(theta_rad);
+            const sin_theta_raw = Math.sin(theta_rad);
+            const x = r * cos_theta_raw;
+            const y = r * sin_theta_raw;
+
+            const x_rounded = x.toFixed(3);
+            const y_rounded = y.toFixed(3);
+            const cos_theta_rounded = cos_theta_raw.toFixed(3);
+            const sin_theta_rounded = sin_theta_raw.toFixed(3);
+
+            const cuadrante = determinarCuadrante(x, y);
+
+            outputDiv.innerHTML = `
+                <p>Cálculo para r = ${r} y θ = ${theta_deg}°:</p>
+                
+                <div class="pasos-desglose">
+                    
+                    <strong>PASO 1: Componente X </strong>
+                    <p>x = r · cos(θ)</p>
+                    <p>x = ${r} · cos(${theta_deg}°)</p>
+                    <p>x = ${r} · ${cos_theta_rounded} = <b>${x_rounded}</b></p>
+                    
+                    <strong>PASO 2: Componente Y </strong>
+                    <p>y = r · sen(θ)</p>
+                    <p>y = ${r} · sen(${theta_deg}°)</p>
+                    <p>y = ${r} · ${sin_theta_rounded} = <b>${y_rounded}</b></p>
+                    
+                    <strong>PASO 3: Resultado Final</strong>
+                    <p>Resultado Rectangular: <strong>${x_rounded} + ${y_rounded}i</strong></p>
+                    <p>Verificación: El punto está en el Cuadrante ${cuadrante}.</p>
+                </div>
+            `;
+            outputDiv.style.color = '#28a745';
+        }
+
+        const headers = document.querySelectorAll('.accordion-header');
+
+        headers.forEach(header => {
+            header.addEventListener('click', function() {
+                this.classList.toggle('active');
+                
+                const content = this.nextElementSibling;
+                
+                if (content.style.display === "block") {
+                    content.style.display = "none";
+                } else {
+                    document.querySelectorAll('.content').forEach(c => c.style.display = "none");
+                    document.querySelectorAll('.accordion-header').forEach(h => h.classList.remove('active'));
+
+                    content.style.display = "block";
+                    this.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
